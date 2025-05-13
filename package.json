@@ -1,7 +1,7 @@
 {
   "name": "mini-framework-z01",
   "version": "1.0.0",
-  "description": "Advanced event handling utilities for JavaScript applications",
+  "description": "Mini Framework is designed to provide a simple yet powerful approach to building web applications with minimal overhead.",
   "main": "dist/index.js",
   "module": "src/index.js",
   "scripts": {

@@ -1,8 +1,8 @@
 src/
 test/
 examples/
+subject/
 .babelrc
 .gitignore
 .editorconfig
 *.log
-*.md
