@@ -26,7 +26,7 @@ npm install mini-framework-z01
 ### CDN
 
 ```html
-<script src="https://www.npmjs.com/package/mini-framework-z01"></script>
+<script src="https://cdn.jsdelivr.net/npm/mini-framework-z01@1.0.4/dist/mini-framework-z01.min.js"></script>
 ```
 
 ## Quick Start
