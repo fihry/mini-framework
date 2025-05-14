@@ -1,232 +1,161 @@
-# Mini Framework Documentation
+# Mini Framework
 
-## Welcome
+![Mini Framework](https://img.shields.io/badge/Mini-Framework-blue)
+![Version](https://img.shields.io/badge/version-1.2.0-green)
+![License](https://img.shields.io/badge/license-MIT-orange)
 
-Welcome to the Mini Framework documentation. This lightweight framework provides powerful tools for building modern web applications.
-
-## Quick Links
-
-- [Getting Started](/getting-started/installation.md)
-- [Core Concepts](/core-concepts/virtual-dom.md)
-- [API Reference](/api-reference/dom.md)
+A lightweight, powerful JavaScript framework for building modern web applications with minimal overhead.
 
 ## Features
 
-- 🚀 Virtual DOM Manipulation
-- 🗺️ Client-side Routing
-- 🔄 State Management
-- 🎉 Custom Event Handling
+- 🚀 **Virtual DOM** - Efficient DOM manipulation with diffing algorithm
+- 🔄 **State Management** - Simple and reactive state handling
+- 🗺️ **Client-side Routing** - Seamless navigation without page reloads
+- 📡 **Event System** - Flexible publish/subscribe event architecture
+- ⚡ **Performance Focused** - Optimized rendering with minimal DOM operations
+- 🧩 **Component-Based** - Build reusable, composable UI components
 
-## Overview
+## Installation
 
-Mini Framework is designed to provide a simple yet powerful approach to building web applications with minimal overhead.
-
-```markdown
-2. `docs/getting-started/installation.md`:
-```
-# Installation
-
-## NPM Installation
-
-You can install Mini Framework using npm:
+### NPM
 
 ```bash
 npm install mini-framework
 ```
 
-## CDN Usage
-
-Include the framework directly in your HTML:
+### CDN
 
 ```html
-<script src="https://cdn.example.com/mini-framework.js"></script>
+<script src="https://www.npmjs.com/package/mini-framework-z01"></script>
 ```
 
-## Basic Setup
-
-After installation, import the framework in your JavaScript:
+## Quick Start
 
 ```javascript
 import framework from 'mini-framework';
-// Create your first element
+
+// Create a virtual DOM element
 const app = framework.createElement('div', { id: 'app' }, [
   framework.createElement('h1', {}, 'Hello, Mini Framework!')
 ]);
 
-// Render the element
+// Render to the DOM
 framework.render(app, document.body);
 ```
 
-## Compatibility
+## Core Concepts
 
-- Modern Browsers (Chrome, Firefox, Safari, Edge)
-- ES6+ Support Required
-```markdown
+### Virtual DOM
 
-3. `docs/core-concepts/virtual-dom.md`:
-```
-# Virtual DOM
-
-## What is Virtual DOM?
-
-Virtual DOM is a lightweight copy of the actual DOM that allows for efficient updates and rendering.
-
-## How It Works
-
-1. Create a virtual representation of the DOM
-2. Compare changes between virtual and real DOM
-3. Minimize actual DOM manipulations
-
-## Example
+The framework uses a virtual DOM to minimize actual DOM manipulations:
 
 ```javascript
-// Creating a virtual element
+// Create elements
 const element = framework.createElement('div', { class: 'container' }, [
   framework.createElement('p', {}, 'Hello World')
 ]);
 
-// Rendering the element
-framework.render(element, document.body);
-```markdown
+// Render to DOM
+framework.render(element, document.getElementById('app'));
 
-## Benefits
-
-- Improved Performance
-- Efficient Updates
-- Simplified DOM Manipulation
-
-4. `docs/api-reference/dom.md`:
-```
-# DOM API Reference
-
-## createElement()
-
-Creates a virtual DOM element.
-
-### Signature
-```javascript
-framework.createElement(tag, attributes, children)
+// Update efficiently
+const newElement = framework.createElement('div', { class: 'container' }, [
+  framework.createElement('p', {}, 'Updated content')
+]);
+framework.update(newElement, document.getElementById('app'));
 ```
 
-### Parameters
-- `tag` (String): HTML tag name
-- `attributes` (Object, optional): Element attributes
-- `children` (Array, optional): Child elements
+### DOM Manipulation
 
-### Examples
+The framework provides direct DOM manipulation methods:
 
 ```javascript
-// Simple div
-const div = framework.createElement('div');
+// Remove an element from the DOM
+const elementToRemove = document.getElementById('old-element');
+framework.removeElement(elementToRemove);
 
-// Div with attributes
-const divWithClass = framework.createElement('div', { 
-  class: 'container' 
+// Replace an element with a new one
+const oldElement = document.getElementById('old-element');
+const newElement = document.createElement('div');
+newElement.textContent = 'I am the replacement';
+framework.replaceElement(newElement, oldElement);
+```
+
+These methods provide fine-grained control when you need to directly manipulate the DOM outside of the virtual DOM diffing process.
+
+### State Management
+
+Manage application state with reactive updates:
+
+```javascript
+import { StateManager } from 'mini-framework';
+
+// Create state
+const state = new StateManager({
+  count: 0,
+  user: { name: 'Guest' }
 });
 
-// Div with children
-const divWithChildren = framework.createElement('div', {}, [
-  framework.createElement('p', {}, 'Child Element')
-]);
+// Subscribe to changes
+state.subscribe(newState => {
+  console.log('State updated:', newState);
+  renderApp();
+});
+
+// Update state
+state.setState({ count: state.getState().count + 1 });
 ```
 
-## render()
+### Routing
 
-Renders a virtual DOM element to the actual DOM.
+Handle client-side navigation:
 
-### Signature
 ```javascript
-framework.render(element, container)
+import { router } from 'mini-framework';
+
+// Define routes
+router.addRoute('/', HomeComponent);
+router.addRoute('/about', AboutComponent);
+router.addRoute('/contact', ContactComponent);
+
+// Navigate programmatically
+document.getElementById('about-link').addEventListener('click', () => {
+  router.navigate('/about');
+});
 ```
 
-### Parameters
-- `element`: Virtual DOM element to render
-- `container`: DOM element to append the rendered element
-```markdown
+### Event System
 
-5. `docs/examples/todo-app.md`:
+Create a decoupled architecture with events:
+
+```javascript
+import { events } from 'mini-framework';
+
+// Subscribe to events
+events.on('user:login', user => {
+  console.log('User logged in:', user);
+});
+
+// Emit events
+events.emit('user:login', { id: 1, name: 'John' });
+
+// Unsubscribe
+const handler = data => console.log(data);
+events.on('notification', handler);
+events.off('notification', handler);
 ```
-# TodoMVC Example
-
-## Overview
-
-This example demonstrates building a complete Todo application using Mini Framework.
 
 ## Project Structure
 
-```tree
-todo-app/
-├── index.html
-├── app.js
-└── styles.css
 ```
-
-## Implementation
-
-### HTML (index.html)
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Todo App</title>
-</head>
-<body>
-  <div id="app"></div>
-  <script type="module" src="app.js"></script>
-</body>
-</html>
-```
-
-### JavaScript (app.js)
-```javascript
-import framework from 'mini-framework';
-
-class TodoApp {
-  constructor() {
-    this.state = new framework.State({
-      todos: [],
-      input: ''
-    });
-  }
-
-  render() {
-    const todoList = framework.createElement('ul', {}, 
-      this.state.getState().todos.map(todo => 
-        framework.createElement('li', {}, todo)
-      )
-    );
-
-    const app = framework.createElement('div', {}, [
-      framework.createElement('input', { 
-        type: 'text', 
-        value: this.state.getState().input 
-      }),
-      framework.createElement('button', {}, 'Add Todo'),
-      todoList
-    ]);
-
-    framework.render(app, document.getElementById('app'));
-  }
-}
-```
-
-## Key Concepts Demonstrated
-
-- State Management
-- Event Handling
-- Virtual DOM Rendering
-
-
-
-```tree
-my-mini-framework/
+mini-framework/
 │
 ├── src/
 │   ├── core/
-│   │   ├── dom.js        # DOM manipulation
-│   │   ├── router.js     # Routing system
+│   │   ├── dom.js        # Virtual DOM implementation
+│   │   ├── router.js     # Client-side routing
 │   │   ├── state.js      # State management
-│   │   └── events.js     # Event handling
+│   │   └── events.js     # Event system
 │   │
 │   ├── framework.js      # Main framework entry point
 │   └── index.js          # Framework initialization
@@ -237,5 +166,32 @@ my-mini-framework/
 │       ├── app.js
 │       └── styles.css
 │
-├── README.md             # Framework documentation
+├── README.md
 └── package.json
+```
+
+## Examples
+
+Check out the [TodoMVC example](/examples/todo) to see a complete application built with Mini Framework.
+
+## Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+- ES6+ compatible browsers
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

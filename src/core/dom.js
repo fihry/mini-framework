@@ -10,6 +10,16 @@ class VirtualDOM {
       children
     };
   }
+  removeElement(element) {
+    if (element.parentNode) {
+      element.parentNode.removeChild(element);
+    }
+  }
+
+  replaceElement(newElement, oldElement) {
+    const parentElement = oldElement.parentNode;
+    parentElement.replaceChild(newElement, oldElement);
+  }
 
   render(element, container) {
     const domElement = this.createDOMElement(element);
