@@ -33,6 +33,8 @@ npm install mini-framework-z01
 
 ```javascript
 import framework from 'mini-framework-z01';
+// or 
+import framework from 'https://cdn.jsdelivr.net/npm/mini-framework-z01/dist/mini-framework-z01.min.js';
 
 // Create a virtual DOM element
 const app = framework.createElement('div', { id: 'app' }, [
