@@ -1,5 +1,5 @@
-import MiniFramework from 'mini-framework-z01';
-const { createElement, render } = MiniFramework;
+import miniFramework from "https://cdn.jsdelivr.net/npm/mini-framework-z01@1.0.4/dist/mini-framework-z01.min.js";
+const { createElement, render } = miniFramework;
 const App = () => {
   return createElement('div', { class: 'app' }, [
     createElement('h1', { class: 'title' }, ['Todo List']),

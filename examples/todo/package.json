@@ -4,15 +4,10 @@
   "description": "todo list based on mini-framework",
   "main": "app.js",
   "scripts": {
-    "test": "npm test"
+    "start": "npx serve"
   },
   "keywords": [
     "todo",
     "list"
-  ],
-  "author": "fihry",
-  "license": "MIT",
-  "dependencies": {
-    "mini-framework-z01": "^1.0.2"
-  }
+  ]
 }
