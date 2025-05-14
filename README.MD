@@ -148,7 +148,7 @@ events.off('notification', handler);
 ## Project Structure
 
 ```
-mini-framework/
+mini-framework-z01/
 │
 ├── src/
 │   ├── core/
