@@ -32,7 +32,7 @@ npm install mini-framework-z01
 ## Quick Start
 
 ```javascript
-import framework from 'mini-framework';
+import framework from 'mini-framework-z01';
 
 // Create a virtual DOM element
 const app = framework.createElement('div', { id: 'app' }, [
@@ -88,7 +88,7 @@ These methods provide fine-grained control when you need to directly manipulate 
 Manage application state with reactive updates:
 
 ```javascript
-import { StateManager } from 'mini-framework';
+import { StateManager } from 'mini-framework-z01';
 
 // Create state
 const state = new StateManager({
@@ -111,7 +111,7 @@ state.setState({ count: state.getState().count + 1 });
 Handle client-side navigation:
 
 ```javascript
-import { router } from 'mini-framework';
+import { router } from 'mini-framework-z01';
 
 // Define routes
 router.addRoute('/', HomeComponent);
@@ -129,7 +129,7 @@ document.getElementById('about-link').addEventListener('click', () => {
 Create a decoupled architecture with events:
 
 ```javascript
-import { events } from 'mini-framework';
+import { events } from 'mini-framework-z01';
 
 // Subscribe to events
 events.on('user:login', user => {
