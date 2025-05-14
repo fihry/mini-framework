@@ -1,4 +1,4 @@
-import MiniFramework from '../../src/framework.js';
+import MiniFramework from 'mini-framework-z01';
 const { createElement, render } = MiniFramework;
 const App = () => {
   return createElement('div', { class: 'app' }, [

@@ -1,0 +1,18 @@
+{
+  "name": "todo",
+  "version": "1.0.0",
+  "description": "todo list based on mini-framework",
+  "main": "app.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "keywords": [
+    "todo",
+    "list"
+  ],
+  "author": "fihry",
+  "license": "MIT",
+  "dependencies": {
+    "mini-framework-z01": "^1.0.2"
+  }
+}
