@@ -9,10 +9,19 @@ class VirtualDOM {
       children
     };
   }
+  removeElement(element) {
+    if (element.parentNode) {
+      element.parentNode.removeChild(element);
+    }
+  }
+  replaceElement(newElement, oldElement) {
+    const parentElement = oldElement.parentNode;
+    parentElement.replaceChild(newElement, oldElement);
+  }
   render(element, container) {
-    container.innerHTML = ''; // Clear the container
     const domElement = this.createDOMElement(element);
     container.appendChild(domElement);
+    this.tree = element;
   }
   createDOMElement(node) {
     if (typeof node === 'string') {

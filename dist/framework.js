@@ -12,6 +12,12 @@ class MiniFramework {
   createElement(tag, attrs, children) {
     return VirtualDOM.createElement(tag, attrs, children);
   }
+  removeElement(element) {
+    VirtualDOM.removeElement(element);
+  }
+  replaceElement(newElement, oldElement) {
+    VirtualDOM.replaceElement(newElement, oldElement);
+  }
   render(element, container) {
     VirtualDOM.render(element, container);
   }
