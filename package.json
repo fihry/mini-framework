@@ -1,9 +1,9 @@
 {
   "name": "mini-framework-z01",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Mini Framework is designed to provide a simple yet powerful approach to building web applications with minimal overhead.",
-  "main": "dist/index.js",
-  "module": "src/index.js",
+  "main": "dist/mini-framework-z01.js",
+  "module": "src/mini-framework-z01.js",
   "scripts": {
     "build": "babel src -d dist",
     "test": "jest",
