@@ -20,7 +20,7 @@ A lightweight, powerful JavaScript framework for building modern web application
 ### NPM
 
 ```bash
-npm install mini-framework
+npm install mini-framework-z01
 ```
 
 ### CDN
