@@ -1,5 +1,5 @@
-import miniFramework from "https://cdn.jsdelivr.net/npm/mini-framework-z01@1.0.4/dist/mini-framework-z01.min.js";
-const { createElement, render } = miniFramework;
+import miniFramework from "../../src/mini-framework-z01.js";
+const { createElement, render,createStore } = miniFramework;
 const App = () => {
   return createElement('div', { class: 'app' }, [
     createElement('h1', { class: 'title' }, ['Todo List']),
@@ -8,17 +8,16 @@ const App = () => {
     createElement('ul', { class: 'todo-list' }),
   ]);
 };
-
 const container = document.getElementById('app');
 render(App(), container);
-const todos = [];
+const todos = createStore([]);
 const addButton = document.querySelector('.add-button');
 const inputField = document.querySelector('input[type="text"]');
 const todoList = document.querySelector('.todo-list');
 addButton.addEventListener('click', () => {
   const todoText = inputField.value;
   if (todoText) {
-    todos.push(todoText);
+    todos.setState([...todos.state, todoText]);
     inputField.value = '';
     renderTodos();
   }
@@ -26,9 +25,8 @@ addButton.addEventListener('click', () => {
 
 const renderTodos = () => {
   todoList.innerHTML = '';
-  todos.forEach(todo => {
+  todos.getState().forEach(todo => {
     const li = createElement('li', {}, [todo]);
     render(li, todoList);
-  }
-  );
+  }); 
 };

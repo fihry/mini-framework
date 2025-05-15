@@ -5,12 +5,12 @@ class StateManager {
   }
 
   setState(newState) {
-    this.state = { ...this.state, ...newState };
+    this.state = newState
     this.notify();
   }
 
   getState() {
-    return { ...this.state };
+    return this.state;
   }
 
   subscribe(listener) {
