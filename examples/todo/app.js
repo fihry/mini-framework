@@ -1,32 +1,179 @@
-import miniFramework from "../../src/mini-framework-z01.js";
-const { createElement, render,createStore } = miniFramework;
-const App = () => {
-  return createElement('div', { class: 'app' }, [
-    createElement('h1', { class: 'title' }, ['Todo List']),
-    createElement('input', { type: 'text', placeholder: 'Add a new todo' }),
-    createElement('button', { class: 'add-button' }, ['Add']),
-    createElement('ul', { class: 'todo-list' }),
-  ]);
-};
+import {
+  createElement,
+  render,
+  createStore,
+  events,
+} from '../../src/mini-framework-z01.js';
+
 const container = document.getElementById('app');
+const saved = JSON.parse(localStorage.getItem('todo-app')) || {
+  persist: { hydrated: true },
+  todos: [],
+};
+
+const todos = createStore(saved.todos);
+let filter = 'all'; // all, active, completed
+
+const saveTodos = () => {
+  const state = {
+    persist: { hydrated: true },
+    todos: todos.getState(),
+  };
+  localStorage.setItem('todo-app', JSON.stringify(state));
+};
+
+const App = () =>
+  createElement('div', { class: 'app-container' }, [
+    createElement('h1', { class: 'app-title' }, ['todos']),
+    createElement('form', { class: 'todo-form' }, [
+      createElement('input', {
+        type: 'text',
+        class: 'todo-input',
+        placeholder: 'What needs to be done?',
+        autocomplete: 'off',
+      }),
+    ]),
+    createElement('ul', { class: 'todo-list' }),
+    createElement('div', { class: 'footer' }, [
+      createElement('span', { class: 'count' }, ['']),
+      createElement('div', { class: 'filters' }, [
+        createElement('button', { class: 'filter-button active', 'data-filter': 'all' }, ['All']),
+        createElement('button', { class: 'filter-button', 'data-filter': 'active' }, ['Active']),
+        createElement('button', { class: 'filter-button', 'data-filter': 'completed' }, ['Completed']),
+      ]),
+      createElement('button', { class: 'clear-completed', style: {display: 'none'} }, ['Clear completed']),
+    ]),
+  ]);
 render(App(), container);
-const todos = createStore([]);
-const addButton = document.querySelector('.add-button');
-const inputField = document.querySelector('input[type="text"]');
-const todoList = document.querySelector('.todo-list');
-addButton.addEventListener('click', () => {
-  const todoText = inputField.value;
-  if (todoText) {
-    todos.setState([...todos.state, todoText]);
-    inputField.value = '';
+
+const input = container.querySelector('.todo-input');
+const list = container.querySelector('.todo-list');
+const countSpan = container.querySelector('.count');
+
+let filteredTodos = [];
+
+// Render todos based on current filter
+const renderTodos = () => {
+  list.innerHTML = '';
+  const allTodos = todos.getState();
+
+  // Filter todos
+  filteredTodos = allTodos
+    .map((todo, idx) => ({ todo, idx })) // attach original index
+    .filter(({ todo }) => {
+      if (filter === 'active') return !todo.isCompleted;
+      if (filter === 'completed') return todo.isCompleted;
+      return true;
+    });
+
+  filteredTodos.forEach(({ todo }, i) => {
+    const li = createElement('li', { class: 'todo-item' }, [
+      createElement('input', {
+        type: 'checkbox',
+        class: 'todo-checkbox',
+        'data-index': i,
+        ...(todo.isCompleted ? { checked: true } : {}),
+      }),
+      createElement('span', {
+        class: `todo-text ${todo.isCompleted ? 'completed' : ''}`,
+        'data-index': i,
+      }, [todo.text]),
+    ]);
+    render(li, list);
+  });
+
+  // Count remaining active todos
+  const remaining = allTodos.filter(t => !t.isCompleted).length;
+  countSpan.textContent = `${remaining} item${remaining !== 1 ? 's' : ''} left`;
+
+  // Show or hide Clear Completed button depending on if there are completed todos
+  const clearBtn = container.querySelector('.clear-completed');
+  const completedCount = allTodos.filter(t => t.isCompleted).length;
+  if (completedCount > 0) {
+    clearBtn.style.display = 'inline-block';
+  } else {
+    clearBtn.style.display = 'none';
+  }
+};
+
+// Add new todo on form submit
+events.on('submit', '.todo-form', e => {
+  e.preventDefault();
+  const text = input.value.trim();
+  if (text) {
+    const newTodo = {
+      id: Date.now(),
+      text,
+      isCompleted: false,
+    };
+    todos.setState([...todos.getState(), newTodo]);
+    input.value = '';
+    saveTodos();
     renderTodos();
   }
 });
 
-const renderTodos = () => {
-  todoList.innerHTML = '';
-  todos.getState().forEach(todo => {
-    const li = createElement('li', {}, [todo]);
-    render(li, todoList);
-  }); 
-};
+// Checkbox change
+events.on('change', '.todo-checkbox', e => {
+  const filteredIndex = Number(e.target.getAttribute('data-index'));
+  if (isNaN(filteredIndex)) return;
+
+  // Get original index from filteredTodos
+  const { idx: originalIndex } = filteredTodos[filteredIndex];
+  const allTodos = todos.getState();
+
+  // Toggle isCompleted
+  const updated = allTodos.map((todo, i) =>
+    i === originalIndex ? { ...todo, isCompleted: !todo.isCompleted } : todo
+  );
+
+  todos.setState(updated);
+  saveTodos();
+  renderTodos();
+});
+
+// Filter buttons
+events.on('click', '.filter-button', e => {
+  filter = e.target.getAttribute('data-filter');
+  document.querySelectorAll('.filter-button').forEach(btn =>
+    btn.classList.toggle('active', btn.getAttribute('data-filter') === filter)
+  );
+  renderTodos();
+});
+
+// Double click to edit todo text
+events.on('dblclick', '.todo-text', e => {
+  const filteredIndex = Number(e.target.getAttribute('data-index'));
+  if (isNaN(filteredIndex)) return;
+
+  const { todo, idx: originalIndex } = filteredTodos[filteredIndex];
+  const updatedText = prompt('Edit todo:', todo.text);
+  if (updatedText === null) return;
+
+  const trimmedText = updatedText.trim();
+  const allTodos = todos.getState();
+
+  if (trimmedText === '') {
+    // Remove todo
+    const updated = allTodos.filter((_, i) => i !== originalIndex);
+    todos.setState(updated);
+  } else {
+    // Update text
+    const updated = allTodos.map((t, i) =>
+      i === originalIndex ? { ...t, text: trimmedText } : t
+    );
+    todos.setState(updated);
+  }
+  saveTodos();
+  renderTodos();
+});
+
+// Clear completed todos
+events.on('click', '.clear-completed', () => {
+  const updated = todos.getState().filter(todo => !todo.isCompleted);
+  todos.setState(updated);
+  saveTodos();
+  renderTodos();
+});
+
+renderTodos();

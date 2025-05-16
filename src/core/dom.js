@@ -94,4 +94,4 @@ class VirtualDOM {
 
 
 
-export default new VirtualDOM();
+export default VirtualDOM;

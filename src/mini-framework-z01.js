@@ -1,65 +1,47 @@
+// src/mini-framework-z01.js
 import VirtualDOM from './core/dom.js';
 import Router from './core/router.js';
 import StateManager from './core/state.js';
 import EventManager from './core/events.js';
 
 class MiniFramework {
-  constructor() {
-    this.DOM = VirtualDOM;
-    this.Router = Router;
-    this.State = StateManager;
-    this.Events = EventManager;
+  constructor(root = document) {
+    this.DOM = new VirtualDOM();
+    this.Router = new Router();
+    this.State = new StateManager();
+    this.Events = new EventManager(root);
   }
 
-  createElement(tag, attrs, children) {
-    return VirtualDOM.createElement(tag, attrs, children);
-  }
-  removeElement(element) {
-    VirtualDOM.removeElement(element);
-  }
-  replaceElement(newElement, oldElement) {
-    VirtualDOM.replaceElement(newElement, oldElement);
-  }
-
-  render(element, container) {
-    VirtualDOM.render(element, container);
-  }
-  navigate(path) {
-    this.Router.navigate(path);
-  }
-  addRoute(path, component) {
-    this.Router.addRoute(path, component);
-  }
-  setState(state) {
-    this.State.setState(state);
-  }
-  getState() {
-    return this.State.getState();
-  }
-  subscribe(listener) {
-    return this.State.subscribe(listener);
-  }
-  emit(event, data) {
-    this.Events.emit(event, data);
-  }
-  on(event, callback) {
-    this.Events.on(event, callback);
-  }
-  off(event, callback) {
-    this.Events.off(event, callback);
-  }
   createStore(initialState) {
     return new StateManager(initialState);
   }
+
   createRouter() {
     return new Router();
   }
+
   createEventManager() {
-    return new EventManager();
+    return this.Events;
   }
+
   createVirtualDOM() {
-    return new VirtualDOM();
+    return this.DOM;
   }
 }
 
-export default new MiniFramework();
+const miniFramework = new MiniFramework(document.getElementById('app')); // root container
+
+export default miniFramework;
+
+export const createElement = (...args) => miniFramework.DOM.createElement(...args);
+export const removeElement = (...args) => miniFramework.DOM.removeElement(...args);
+export const replaceElement = (...args) => miniFramework.DOM.replaceElement(...args);
+export const render = (...args) => miniFramework.DOM.render(...args);
+export const createStore = (...args) => miniFramework.createStore(...args);
+export const createRouter = (...args) => miniFramework.createRouter(...args);
+export const createEventManager = () => miniFramework.createEventManager();
+
+export const events = miniFramework.Events;
+export const router = miniFramework.Router;
+export const state = miniFramework.State;
+export const dom = miniFramework.DOM;
