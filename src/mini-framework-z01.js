@@ -36,7 +36,8 @@ export default miniFramework;
 export const createElement = (...args) => miniFramework.DOM.createElement(...args);
 export const removeElement = (...args) => miniFramework.DOM.removeElement(...args);
 export const replaceElement = (...args) => miniFramework.DOM.replaceElement(...args);
-export const render = (...args) => miniFramework.DOM.render(...args);
+export const render = (...args) => miniFramework.DOM.render(...args); // this function used for rerender the whole container by passing the container element and the new element
+export const update = (...args) => miniFramework.DOM.update(...args); // this function for update the element by passing the element and the new element and the container element
 export const createStore = (...args) => miniFramework.createStore(...args);
 export const createRouter = (...args) => miniFramework.createRouter(...args);
 export const createEventManager = () => miniFramework.createEventManager();

@@ -1,9 +1,11 @@
 import {
   createElement,
   render,
+  update,
   createStore,
   events,
-} from 'https://cdn.jsdelivr.net/npm/mini-framework-z01@1.0.6/dist/mini-framework-z01.min.js';
+// } from 'https://cdn.jsdelivr.net/npm/mini-framework-z01@1.0.6/dist/mini-framework-z01.min.js';
+}from '../../src/mini-framework-z01.js';
 
 const container = document.getElementById('app');
 const saved = JSON.parse(localStorage.getItem('todo-app')) || {
@@ -41,7 +43,7 @@ const App = () =>
         createElement('button', { class: 'filter-button', 'data-filter': 'active' }, ['Active']),
         createElement('button', { class: 'filter-button', 'data-filter': 'completed' }, ['Completed']),
       ]),
-      createElement('button', { class: 'clear-completed', style: {display: 'none'} }, ['Clear completed']),
+      createElement('button', { class: 'clear-completed', style: { display: 'none' } }, ['Clear completed']),
     ]),
   ]);
 render(App(), container);
@@ -78,6 +80,7 @@ const renderTodos = () => {
         class: `todo-text ${todo.isCompleted ? 'completed' : ''}`,
         'data-index': i,
       }, [todo.text]),
+      createElement('button', { class: 'delete-todo', 'data-index': i }, ['x']),
     ]);
     render(li, list);
   });
@@ -140,8 +143,17 @@ events.on('click', '.filter-button', e => {
   );
   renderTodos();
 });
+// delete one todo
+events.on('click', '.delete-todo', e => {
+  console.log("hello");
+  filter = e.target.getAttribute('data-index');
+  const allTodos = todos.getState();
+  const updated = allTodos.filter((_, i) => i !== Number(filter));
+  todos.setState(updated);
+  saveTodos();
+  renderTodos();
+})
 
-// Double click to edit todo text
 events.on('dblclick', '.todo-text', e => {
   const filteredIndex = Number(e.target.getAttribute('data-index'));
   if (isNaN(filteredIndex)) return;
@@ -153,19 +165,37 @@ events.on('dblclick', '.todo-text', e => {
   const trimmedText = updatedText.trim();
   const allTodos = todos.getState();
 
+  let updated;
   if (trimmedText === '') {
     // Remove todo
-    const updated = allTodos.filter((_, i) => i !== originalIndex);
-    todos.setState(updated);
+    updated = allTodos.filter((_, i) => i !== originalIndex);
   } else {
     // Update text
-    const updated = allTodos.map((t, i) =>
+    updated = allTodos.map((t, i) =>
       i === originalIndex ? { ...t, text: trimmedText } : t
     );
-    todos.setState(updated);
   }
+
+  todos.setState(updated);
   saveTodos();
-  renderTodos();
+  const renderVirtualTreeFromTodos = (todo)=>{
+    createElement('li', { class: 'todo-item' }, [
+      createElement('input', {
+        type: 'checkbox',
+        class: 'todo-checkbox',
+        'data-index': i,
+        ...(todo.isCompleted ? { checked: true } : {}),
+      }),
+      createElement('span', {
+        class: `todo-text ${todo.isCompleted ? 'completed' : ''}`,
+        'data-index': i,
+      }, [todo.text]),
+      createElement('button', { class: 'delete-todo', 'data-index': i }, ['x']),
+    ]);
+  }
+
+  const newTree = renderVirtualTreeFromTodos(updated);
+  update(newTree, container); 
 });
 
 // Clear completed todos
