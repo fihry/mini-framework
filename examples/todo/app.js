@@ -3,7 +3,7 @@ import {
   render,
   createStore,
   events,
-} from '../../src/mini-framework-z01.js';
+} from 'https://cdn.jsdelivr.net/npm/mini-framework-z01@1.0.6/dist/mini-framework-z01.min.js';
 
 const container = document.getElementById('app');
 const saved = JSON.parse(localStorage.getItem('todo-app')) || {
