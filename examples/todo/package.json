@@ -4,8 +4,9 @@
   "description": "todo list based on mini-framework",
   "main": "app.js",
   "scripts": {
-    "start": "npx serve"
+    "start": "npx serve -s ."
   },
+  "license": "MIT",
   "keywords": [
     "todo",
     "list"

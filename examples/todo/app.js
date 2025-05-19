@@ -3,16 +3,15 @@ import {
   render,
   createStore,
   createRouter,
-} from '../../src/mini-framework-z01.js';
+} from 'https://cdn.jsdelivr.net/npm/mini-framework-z01@1.0.7/dist/mini-framework-z01.min.js';
 
 const container = document.getElementById('app');
 const saved = JSON.parse(localStorage.getItem('todo-app')) || {
-  persist: { hydrated: false },
   todos: [],
 };
 
 const todos = createStore(saved.todos);
-let filter = 'all'; // all, active, completed
+let filter = window.location.pathname.split('/')[1] || 'all'; // all | active | completed
 const router = createRouter();
 router.init();
 router.addRoute('/', () => {
@@ -31,7 +30,6 @@ router.addRoute('/completed', () => {
 
 const saveTodos = () => {
   const state = {
-    persist: { hydrated: true },
     todos: todos.getState(),
   };
   localStorage.setItem('todo-app', JSON.stringify(state));
@@ -40,7 +38,7 @@ const saveTodos = () => {
 const renderTodoItem = (todo, i) =>
   createElement(
     'li',
-    { class: 'todo-item', key: todo.id },
+    { class: 'todo-item', 'data-index': i, /*key: todo.id  we can use key to improve performance but that break the order of the list*/ },
     [
       createElement('input', {
         type: 'checkbox',
@@ -64,8 +62,8 @@ const renderTodoItem = (todo, i) =>
 
 const App = () => {
   const allTodos = todos.getState();
-
-  const filteredTodos = allTodos
+  const sortedTodos = allTodos.slice().sort((a, b) => a.id - b.id);
+  const filteredTodos = sortedTodos
     .map((todo, idx) => ({ todo, idx }))
     .filter(({ todo }) => {
       if (filter === 'all') return true;
