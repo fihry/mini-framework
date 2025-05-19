@@ -1,4 +1,3 @@
-// src/mini-framework-z01.js
 import VirtualDOM from './core/dom.js';
 import Router from './core/router.js';
 import StateManager from './core/state.js';
@@ -21,28 +20,41 @@ class MiniFramework {
   }
 
   createEventManager() {
-    return this.Events;
+    return new EventManager(document);
   }
 
   createVirtualDOM() {
-    return this.DOM;
+    return new VirtualDOM();
   }
 }
 
-const miniFramework = new MiniFramework(document.getElementById('app')); // root container
+const miniFramework = new MiniFramework();
 
 export default miniFramework;
 
-export const createElement = (...args) => miniFramework.DOM.createElement(...args);
-export const removeElement = (...args) => miniFramework.DOM.removeElement(...args);
-export const replaceElement = (...args) => miniFramework.DOM.replaceElement(...args);
-export const render = (...args) => miniFramework.DOM.render(...args); // this function used for rerender the whole container by passing the container element and the new element
-export const update = (...args) => miniFramework.DOM.update(...args); // this function for update the element by passing the element and the new element and the container element
-export const createStore = (...args) => miniFramework.createStore(...args);
-export const createRouter = (...args) => miniFramework.createRouter(...args);
-export const createEventManager = () => miniFramework.createEventManager();
+// === Public API Exports ===
 
-export const events = miniFramework.Events;
+/**
+ * Create virtual DOM elements.
+ */
+export const createElement = (...args) =>miniFramework.DOM.createElement(...args);
+export const render = (...args) =>miniFramework.DOM.render(...args);
+export const createStore = (...args) =>miniFramework.createStore(...args);
+
+/**
+ * Create a new Router instance.
+ */
+export const createRouter = (...args) =>
+  miniFramework.createRouter(...args);
+
+/**
+ * Create a new EventManager instance.
+ */
+export const createEventManager = () =>
+  miniFramework.createEventManager();
+
+// Direct access to core singletons (optional)
+export const dom = miniFramework.DOM;
 export const router = miniFramework.Router;
 export const state = miniFramework.State;
-export const dom = miniFramework.DOM;
+export const events = miniFramework.Events;
