@@ -11,6 +11,9 @@ class StateManager {
     return this.state;
   }
   subscribe(listener) {
+    if (typeof listener !== 'function') {
+      throw new Error('Listener must be a function');
+    }
     this.listeners.push(listener);
     return () => {
       this.listeners = this.listeners.filter(l => l !== listener);

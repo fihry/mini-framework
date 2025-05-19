@@ -6,9 +6,11 @@ class Router {
   }
   init() {
     window.addEventListener('popstate', () => this.handleRouteChange());
+    this.handleRouteChange();
   }
   addRoute(path, component) {
     this.routes[path] = component;
+    console.log(this.routes);
   }
   navigate(path) {
     history.pushState({}, '', path);
@@ -19,7 +21,7 @@ class Router {
     const component = this.routes[path];
     if (component) {
       this.currentRoute = path;
-      component.render();
+      component();
     }
   }
 }
