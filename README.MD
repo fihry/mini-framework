@@ -18,24 +18,24 @@ A lightweight, powerful JavaScript framework for building modern web application
 - 🧩 **Component-Based** — Build reusable UI components  
 
 ---
+### Documentation
+- [virtual-dom.md](./docs/virtual-dom.md)
+- [state-management.md](./docs/state-management.md)
+- [routing.md](./docs/routing.md)
+- [event-system.md](./docs/event-system.md)
 
 ## Installation
 
-### NPM
-
-```bash
-npm install mini-framework-z01
-```
 ### CDN
 ```html
 <script src="https://cdn.jsdelivr.net/npm/mini-framework-z01@1.0.7/dist/mini-framework-z01.min.js"></script>
 ```
 ## Quick Start
 ```js
-import { createElement, render } from 'mini-framework-z01';
+import { createElement, render } from 'https://cdn.jsdelivr.net/npm/mini-framework-z01@1.0.7/dist/mini-framework-z01.min.js';
 
 const app = createElement('div', { id: 'app' }, [
-  createElement('h1', {}, 'Hello, Mini Framework!'),
+  createElement('h1', {}, ['Hello, World!']),
 ]);
 
 render(app, document.body);
@@ -59,7 +59,7 @@ const state = createStore({ count: 0 });
 // Subscribe to changes
 state.subscribe(newState => {
   console.log('State updated:', newState);
-  renderApp();
+  render(app(),container);
 });
 
 // Update state triggers subscribers
