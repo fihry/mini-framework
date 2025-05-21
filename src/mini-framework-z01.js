@@ -5,10 +5,10 @@ import EventManager from './core/events.js';
 
 class MiniFramework {
   constructor(root = document) {
-    this.DOM = new VirtualDOM();
     this.Router = new Router();
     this.State = new StateManager();
     this.Events = new EventManager(root);
+    this.DOM = new VirtualDOM(this.Events);
   }
 
   createStore(initialState) {
@@ -37,9 +37,9 @@ export default miniFramework;
 /**
  * Create virtual DOM elements.
  */
-export const createElement = (...args) =>miniFramework.DOM.createElement(...args);
-export const render = (...args) =>miniFramework.DOM.render(...args);
-export const createStore = (...args) =>miniFramework.createStore(...args);
+export const createElement = (...args) => miniFramework.DOM.createElement(...args);
+export const render = (...args) => miniFramework.DOM.render(...args);
+export const createStore = (...args) => miniFramework.createStore(...args);
 
 /**
  * Create a new Router instance.

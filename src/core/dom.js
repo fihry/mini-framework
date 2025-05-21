@@ -1,3 +1,4 @@
+
 class VirtualDOM {
   constructor(eventManager) {
     this.tree = null;
@@ -42,10 +43,10 @@ class VirtualDOM {
       if (attr.startsWith('on') && typeof value === 'function') {
         const eventName = attr.slice(2).toLowerCase();
 
-        this.events.on(eventName, value);  // Register the event through EventManager
+        // this.events.on(eventName, value);  // Register the event through EventManager
         // Attach an event listener to the DOM element via EventManager
-        element.addEventListener(eventName, (e) => this.events.emit(eventName, e));
-
+        // element.addEventListener(eventName, (e) => this.events.emit(eventName));
+        element.addEventListener(eventName, value);
       } else if (attr === 'style' && typeof value === 'object') {
         Object.assign(element.style, value);
       } else {
