@@ -1,6 +1,6 @@
 {
   "name": "mini-framework-z01",
-  "version": "1.0.7",
+  "version": "0.0.0",
   "description": "Mini Framework is designed to provide a simple yet powerful approach to building web applications with minimal overhead.",
   "main": "dist/mini-framework-z01.js",
   "module": "src/mini-framework-z01.js",
@@ -15,7 +15,21 @@
     "dom-events",
     "pubsub"
   ],
-  "author": "fihry",
+  "authors": [
+    {
+      "name": "Fihry"
+    },
+    {
+      "name": "Oussama Benali",
+      "email": "oussama.benali@ump.ac.ma"
+    },
+    {
+      "name": "Brahim"
+    },
+    {
+      "name": "Ghost"
+    }
+  ],
   "license": "MIT",
   "devDependencies": {
     "@babel/cli": "^7.27.0",
