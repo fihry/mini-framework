@@ -41,7 +41,11 @@ class VirtualDOM {
     for (const [attr, value] of Object.entries(node.attrs || {})) {
       if (attr.startsWith('on') && typeof value === 'function') {
         const eventName = attr.slice(2).toLowerCase();
-        element.addEventListener(eventName, value);
+
+        this.events.on(eventName, value);  // Register the event through EventManager
+        // Attach an event listener to the DOM element via EventManager
+        element.addEventListener(eventName, (e) => this.events.emit(eventName, e));
+
       } else if (attr === 'style' && typeof value === 'object') {
         Object.assign(element.style, value);
       } else {
