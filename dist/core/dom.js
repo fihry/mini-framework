@@ -18,6 +18,9 @@ class VirtualDOM {
   render(newTree, container) {
     if (this.tree === null) {
       const domElement = this.createDOMElement(newTree);
+      if (!(container instanceof HTMLElement)) {
+        container = document.querySelector(container);
+      }
       container.innerHTML = '';
       container.appendChild(domElement);
     } else {
