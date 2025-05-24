@@ -10,7 +10,7 @@ class VirtualDOM {
     }
 
     children = children.filter(
-      child => child !== null && child !== undefined && child !== false
+      (child) => child !== null && child !== undefined && child !== false
     );
 
     return {
@@ -27,7 +27,7 @@ class VirtualDOM {
       if (!(container instanceof HTMLElement)) {
         container = document.querySelector(container);
       }
-      container.innerHTML = '';
+      container.innerHTML = "";
       container.appendChild(domElement);
     } else {
       this.diff(this.tree, newTree, container, 0);
@@ -37,15 +37,15 @@ class VirtualDOM {
   }
 
   createDOMElement(node) {
-    if (typeof node === 'string') return document.createTextNode(node);
+    if (typeof node === "string") return document.createTextNode(node);
 
     const element = document.createElement(node.tag);
 
     for (const [attr, value] of Object.entries(node.attrs || {})) {
-      if (attr.startsWith('on') && typeof value === 'function') {
+      if (attr.startsWith("on") && typeof value === "function") {
         const eventName = attr.slice(2).toLowerCase();
         element.addEventListener(eventName, value);
-      } else if (attr === 'style' && typeof value === 'object') {
+      } else if (attr === "style" && typeof value === "object") {
         Object.assign(element.style, value);
       } else {
         element.setAttribute(attr, value);
@@ -72,7 +72,11 @@ class VirtualDOM {
       const newDom = this.createDOMElement(newNode);
       parent.replaceChild(newDom, existingDom);
     } else if (newNode.tag) {
-      this.updateChildren(existingDom, oldNode.children || [], newNode.children || []);
+      this.updateChildren(
+        existingDom,
+        oldNode.children || [],
+        newNode.children || []
+      );
     }
   }
 
@@ -116,7 +120,7 @@ class VirtualDOM {
   hasChanged(oldNode, newNode) {
     if (typeof oldNode !== typeof newNode) return true;
 
-    if (typeof oldNode === 'string') {
+    if (typeof oldNode === "string") {
       return oldNode !== newNode;
     }
 
@@ -129,9 +133,16 @@ class VirtualDOM {
     const newKeys = Object.keys(newAttrs);
 
     if (oldKeys.length !== newKeys.length) return true;
-
+    //skip function comparition
     for (const key of oldKeys) {
-      if (oldAttrs[key] !== newAttrs[key]) return true;
+      const oldVal = oldAttrs[key];
+      const newVal = newAttrs[key];
+
+      if (typeof oldVal === "function" && typeof newVal === "function") {
+        continue; // skip function comparison
+      }
+
+      if (oldVal !== newVal) return true;
     }
 
     return false;
