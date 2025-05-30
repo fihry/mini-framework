@@ -2,6 +2,7 @@ class VirtualDOM {
   constructor(eventManager) {
     this.tree = null;
     this.events = eventManager;
+    this.refs = new Map();
   }
 
   createElement(tag, attrs = {}, children = []) {
@@ -23,7 +24,7 @@ class VirtualDOM {
 
   render(newTree, container) {
     if (this.tree === null) {
-      const domElement = this.createDOMElement(newTree);
+      const domElement = this.createDOMElement(newTree, true);
       if (!(container instanceof HTMLElement)) {
         container = document.querySelector(container);
       }
@@ -36,7 +37,7 @@ class VirtualDOM {
     this.tree = newTree;
   }
 
-  createDOMElement(node) {
+  createDOMElement(node, dom) {
     if (typeof node === "string") return document.createTextNode(node);
 
     const element = document.createElement(node.tag);
@@ -51,7 +52,9 @@ class VirtualDOM {
         element.setAttribute(attr, value);
       }
     }
-
+    if (dom && node.attrs.ref) {
+      this.setRef(node.attrs.ref, element);
+    }
     for (const child of node.children) {
       const childEl = this.createDOMElement(child);
       element.appendChild(childEl);
@@ -64,12 +67,17 @@ class VirtualDOM {
     const existingDom = parent.childNodes[index];
 
     if (!oldNode) {
-      const newDom = this.createDOMElement(newNode);
+      const newDom = this.createDOMElement(newNode, false);
       parent.appendChild(newDom);
     } else if (!newNode) {
-      if (existingDom) parent.removeChild(existingDom);
+      if (existingDom) {
+        parent.removeChild(existingDom);
+        if (oldNode.attrs.ref) {
+          this.removeRef(oldNode.attrs.ref);
+        }
+      }
     } else if (this.hasChanged(oldNode, newNode)) {
-      const newDom = this.createDOMElement(newNode);
+      const newDom = this.createDOMElement(newNode, true);
       parent.replaceChild(newDom, existingDom);
     } else if (newNode.tag) {
       this.updateChildren(
@@ -146,6 +154,21 @@ class VirtualDOM {
     }
 
     return false;
+  }
+  setRef(key, value) {
+    this.refs.set(key, value);
+  }
+
+  useRef(key) {
+    return this.refs.get(key);
+  }
+
+  removeRef(key) {
+    this.refs.delete(key);
+  }
+
+  getState() {
+    return this.state;
   }
 }
 

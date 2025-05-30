@@ -2,15 +2,12 @@ class StateManager {
   constructor(initialState = {}) {
     this.state = initialState;
     this.listeners = [];
+    this.refs = new Map();
   }
 
   setState(newState) {
     this.state = newState
     this.notify();
-  }
-
-  getState() {
-    return this.state;
   }
 
   subscribe(listener) {
