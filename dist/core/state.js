@@ -50,4 +50,11 @@ class StateManager {
     this.refs.delete(key);
   }
 }
-export default StateManager;
+const state = new StateManager();
+export default state;
+
+// Named exports to be imported individually
+export const setRef = state.setRef.bind(state);
+export const getRef = state.getRef.bind(state);
+export const removeRef = state.removeRef.bind(state);
+export const createRef = state.createRef.bind(state);
