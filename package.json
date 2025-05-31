@@ -1,6 +1,6 @@
 {
   "name": "mini-framework-z01",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "Mini Framework is designed to provide a simple yet powerful approach to building web applications with minimal overhead.",
   "main": "dist/mini-framework-z01.js",
   "module": "src/mini-framework-z01.js",
