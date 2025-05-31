@@ -1,6 +1,6 @@
 import VirtualDOM from './core/dom.js';
 import Router from './core/router.js';
-import StateManager from './core/state.js';
+import stateSingleton, { StateManager } from './core/state.js';
 import EventManager from './core/events.js';
 import Signal from './core/signal.js';
 
@@ -8,7 +8,7 @@ class MiniFramework {
   constructor(root = document) {
     this.DOM = new VirtualDOM();
     this.Router = new Router();
-    this.State = new StateManager();
+    this.State = stateSingleton;
     this.Events = new EventManager(root);
     this.root = root;
   }
