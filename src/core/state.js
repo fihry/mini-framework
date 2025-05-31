@@ -54,6 +54,7 @@ class StateManager {
     this.refs.delete(key);
   }
 }
+export { StateManager }; // Export the class for direct use if needed
 const state = new StateManager();
 
 // Proper named exports
