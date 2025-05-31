@@ -1,28 +1,31 @@
-export function createSignal(initialValue) {
-  let value = initialValue;
-  const subscribers = new Set();
+class Signal {
+  static currentEffect = null;
 
-  function get() {
-    if (Signal._currentEffect) {
-      subscribers.add(Signal._currentEffect);
+  constructor(initialValue) {
+    this.value = initialValue;
+    this.subscribers = new Set();
+    this.isSignal = true;
+  }
+
+  get() {
+    if (Signal.currentEffect) {
+      this.subscribers.add(Signal.currentEffect);
     }
-    return value;
+    return this.value;
   }
 
-  function set(newValue) {
-    value = newValue;
-    subscribers.forEach((fn) => fn());
+  set(newValue) {
+    if (this.value !== newValue) {
+      this.value = newValue;
+      this.subscribers.forEach((fn) => fn());
+    }
   }
-
-  return { get, set };
+  get value() {
+    return this.get();
+  }
+  set value(newValue) {
+    this.set(newValue);
+  }
 }
 
-export function effect(fn) {
-  Signal._currentEffect = fn;
-  fn();
-  Signal._currentEffect = null;
-}
-
-const Signal = {
-  _currentEffect: null
-};
+export default Signal;

@@ -1,8 +1,11 @@
+import { setRef } from "./state.js";
+
 class VirtualDOM {
   constructor(eventManager) {
     this.tree = null;
     this.events = eventManager;
     this.refs = new Map();
+    this.subscriptions = new Map(); // (optional for advanced cleanup)
   }
 
   createElement(tag, attrs = {}, children = []) {
@@ -37,7 +40,17 @@ class VirtualDOM {
     this.tree = newTree;
   }
 
-  createDOMElement(node, dom) {
+  createDOMElement(node, dom = false) {
+    // Reactive text node from signal
+    if (typeof node === "function" && node.isSignal) {
+      const textNode = document.createTextNode(node());
+      this.subscribe(node, () => {
+        textNode.nodeValue = node();
+      });
+      return textNode;
+    }
+
+    // Static text node
     if (typeof node === "string") return document.createTextNode(node);
 
     const element = document.createElement(node.tag);
@@ -48,13 +61,29 @@ class VirtualDOM {
         element.addEventListener(eventName, value);
       } else if (attr === "style" && typeof value === "object") {
         Object.assign(element.style, value);
+      } else if (attr === "ref" && dom) {
+        if (typeof value === "object" && value !== null && "current" in value) {
+          value.current = element;
+        } else {
+          setRef(value, element);
+        }
+      } else if (typeof value === "function" && value && value.isSignal) {
+        // Reactive attribute binding
+        const updateAttr = () => {
+          if (attr === "style" && typeof value() === "object") {
+            Object.assign(element.style, value());
+          } else {
+            element.setAttribute(attr, value());
+          }
+        };
+
+        updateAttr();
+        this.subscribe(value, updateAttr);
       } else {
         element.setAttribute(attr, value);
       }
     }
-    if (dom && node.attrs.ref) {
-      this.setRef(node.attrs.ref, element);
-    }
+
     for (const child of node.children) {
       const childEl = this.createDOMElement(child);
       element.appendChild(childEl);
@@ -67,12 +96,12 @@ class VirtualDOM {
     const existingDom = parent.childNodes[index];
 
     if (!oldNode) {
-      const newDom = this.createDOMElement(newNode, false);
+      const newDom = this.createDOMElement(newNode, true);
       parent.appendChild(newDom);
     } else if (!newNode) {
       if (existingDom) {
         parent.removeChild(existingDom);
-        if (oldNode.attrs.ref) {
+        if (oldNode.attrs?.ref) {
           this.removeRef(oldNode.attrs.ref);
         }
       }
@@ -127,48 +156,29 @@ class VirtualDOM {
 
   hasChanged(oldNode, newNode) {
     if (typeof oldNode !== typeof newNode) return true;
-
-    if (typeof oldNode === "string") {
-      return oldNode !== newNode;
-    }
-
+    if (typeof oldNode === "string") return oldNode !== newNode;
     if (oldNode.tag !== newNode.tag) return true;
 
     const oldAttrs = oldNode.attrs || {};
     const newAttrs = newNode.attrs || {};
-
     const oldKeys = Object.keys(oldAttrs);
     const newKeys = Object.keys(newAttrs);
 
     if (oldKeys.length !== newKeys.length) return true;
-    //skip function comparition
+
     for (const key of oldKeys) {
       const oldVal = oldAttrs[key];
       const newVal = newAttrs[key];
 
-      if (typeof oldVal === "function" && typeof newVal === "function") {
-        continue; // skip function comparison
-      }
-
+      if (typeof oldVal === "function" && typeof newVal === "function") continue;
       if (oldVal !== newVal) return true;
     }
 
     return false;
   }
-  setRef(key, value) {
-    this.refs.set(key, value);
-  }
 
-  useRef(key) {
-    return this.refs.get(key);
-  }
-
-  removeRef(key) {
-    this.refs.delete(key);
-  }
-
-  getState() {
-    return this.state;
+  subscribe(signal, callback) {
+    signal.subscribers.add(callback);
   }
 }
 
