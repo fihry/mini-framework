@@ -1,14 +1,21 @@
+import Signal from './signal.js';
 class StateManager {
   constructor(initialState = {}) {
     this.state = initialState;
     this.listeners = [];
-  }
-  setState(newState) {
-    this.state = newState;
-    this.notify();
+    this.refs = new Map();
   }
   getState() {
-    return this.state;
+    return {
+      ...this.state
+    };
+  }
+  setState(newState) {
+    this.state = {
+      ...this.state,
+      ...newState
+    };
+    this.notify();
   }
   subscribe(listener) {
     if (typeof listener !== 'function') {
@@ -21,6 +28,26 @@ class StateManager {
   }
   notify() {
     this.listeners.forEach(listener => listener(this.state));
+  }
+  createRef(initialValue = null) {
+    const signal = new Signal(initialValue);
+    return {
+      get current() {
+        return signal.get();
+      },
+      set current(value) {
+        signal.set(value);
+      }
+    };
+  }
+  setRef(key, value) {
+    this.refs.set(key, value);
+  }
+  getRef(key) {
+    return this.refs.get(key);
+  }
+  removeRef(key) {
+    this.refs.delete(key);
   }
 }
 export default StateManager;

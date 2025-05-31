@@ -1,7 +1,10 @@
+import { setRef } from "./state.js";
 class VirtualDOM {
   constructor(eventManager) {
     this.tree = null;
     this.events = eventManager;
+    this.refs = new Map();
+    this.subscriptions = new Map(); // (optional for advanced cleanup)
   }
   createElement(tag, attrs = {}, children = []) {
     if (!Array.isArray(children)) {
@@ -17,26 +20,53 @@ class VirtualDOM {
   }
   render(newTree, container) {
     if (this.tree === null) {
-      const domElement = this.createDOMElement(newTree);
+      const domElement = this.createDOMElement(newTree, true);
       if (!(container instanceof HTMLElement)) {
         container = document.querySelector(container);
       }
-      container.innerHTML = '';
+      container.innerHTML = "";
       container.appendChild(domElement);
     } else {
       this.diff(this.tree, newTree, container, 0);
     }
     this.tree = newTree;
   }
-  createDOMElement(node) {
-    if (typeof node === 'string') return document.createTextNode(node);
+  createDOMElement(node, dom = false) {
+    // Reactive text node from signal
+    if (typeof node === "function" && node.isSignal) {
+      const textNode = document.createTextNode(node());
+      this.subscribe(node, () => {
+        textNode.nodeValue = node();
+      });
+      return textNode;
+    }
+
+    // Static text node
+    if (typeof node === "string") return document.createTextNode(node);
     const element = document.createElement(node.tag);
     for (const [attr, value] of Object.entries(node.attrs || {})) {
-      if (attr.startsWith('on') && typeof value === 'function') {
+      if (attr.startsWith("on") && typeof value === "function") {
         const eventName = attr.slice(2).toLowerCase();
         element.addEventListener(eventName, value);
-      } else if (attr === 'style' && typeof value === 'object') {
+      } else if (attr === "style" && typeof value === "object") {
         Object.assign(element.style, value);
+      } else if (attr === "ref" && dom) {
+        if (typeof value === "object" && value !== null && "current" in value) {
+          value.current = element;
+        } else {
+          setRef(value, element);
+        }
+      } else if (typeof value === "function" && value && value.isSignal) {
+        // Reactive attribute binding
+        const updateAttr = () => {
+          if (attr === "style" && typeof value() === "object") {
+            Object.assign(element.style, value());
+          } else {
+            element.setAttribute(attr, value());
+          }
+        };
+        updateAttr();
+        this.subscribe(value, updateAttr);
       } else {
         element.setAttribute(attr, value);
       }
@@ -50,12 +80,17 @@ class VirtualDOM {
   diff(oldNode, newNode, parent, index = 0) {
     const existingDom = parent.childNodes[index];
     if (!oldNode) {
-      const newDom = this.createDOMElement(newNode);
+      const newDom = this.createDOMElement(newNode, true);
       parent.appendChild(newDom);
     } else if (!newNode) {
-      if (existingDom) parent.removeChild(existingDom);
+      if (existingDom) {
+        parent.removeChild(existingDom);
+        if (oldNode.attrs?.ref) {
+          this.removeRef(oldNode.attrs.ref);
+        }
+      }
     } else if (this.hasChanged(oldNode, newNode)) {
-      const newDom = this.createDOMElement(newNode);
+      const newDom = this.createDOMElement(newNode, true);
       parent.replaceChild(newDom, existingDom);
     } else if (newNode.tag) {
       this.updateChildren(existingDom, oldNode.children || [], newNode.children || []);
@@ -97,9 +132,7 @@ class VirtualDOM {
   }
   hasChanged(oldNode, newNode) {
     if (typeof oldNode !== typeof newNode) return true;
-    if (typeof oldNode === 'string') {
-      return oldNode !== newNode;
-    }
+    if (typeof oldNode === "string") return oldNode !== newNode;
     if (oldNode.tag !== newNode.tag) return true;
     const oldAttrs = oldNode.attrs || {};
     const newAttrs = newNode.attrs || {};
@@ -107,9 +140,15 @@ class VirtualDOM {
     const newKeys = Object.keys(newAttrs);
     if (oldKeys.length !== newKeys.length) return true;
     for (const key of oldKeys) {
-      if (oldAttrs[key] !== newAttrs[key]) return true;
+      const oldVal = oldAttrs[key];
+      const newVal = newAttrs[key];
+      if (typeof oldVal === "function" && typeof newVal === "function") continue;
+      if (oldVal !== newVal) return true;
     }
     return false;
+  }
+  subscribe(signal, callback) {
+    signal.subscribers.add(callback);
   }
 }
 export default VirtualDOM;
