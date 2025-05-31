@@ -1,22 +1,21 @@
 import Signal from './signal.js';
+
 class StateManager {
   constructor(initialState = {}) {
     this.state = initialState;
     this.listeners = [];
     this.refs = new Map();
   }
+
   getState() {
-    return {
-      ...this.state
-    };
+    return { ...this.state };
   }
+
   setState(newState) {
-    this.state = {
-      ...this.state,
-      ...newState
-    };
+    this.state = { ...this.state, ...newState };
     this.notify();
   }
+
   subscribe(listener) {
     if (typeof listener !== 'function') {
       throw new Error('Listener must be a function');
@@ -26,9 +25,11 @@ class StateManager {
       this.listeners = this.listeners.filter(l => l !== listener);
     };
   }
+
   notify() {
     this.listeners.forEach(listener => listener(this.state));
   }
+
   createRef(initialValue = null) {
     const signal = new Signal(initialValue);
     return {
@@ -40,16 +41,20 @@ class StateManager {
       }
     };
   }
+
   setRef(key, value) {
     this.refs.set(key, value);
   }
+
   getRef(key) {
     return this.refs.get(key);
   }
+
   removeRef(key) {
     this.refs.delete(key);
   }
 }
+export { StateManager }; // Export the class for direct use if needed
 const state = new StateManager();
 
 // Proper named exports
