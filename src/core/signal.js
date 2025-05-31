@@ -1,8 +1,7 @@
 class Signal {
   static currentEffect = null;
-
   constructor(initialValue) {
-    this.value = initialValue;
+    this._value = initialValue;
     this.subscribers = new Set();
     this.isSignal = true;
   }
@@ -11,18 +10,20 @@ class Signal {
     if (Signal.currentEffect) {
       this.subscribers.add(Signal.currentEffect);
     }
-    return this.value;
+    return this._value;
   }
 
   set(newValue) {
-    if (this.value !== newValue) {
-      this.value = newValue;
-      this.subscribers.forEach((fn) => fn());
+    if (this._value !== newValue) {
+      this._value = newValue;
+      this.subscribers.forEach(fn => fn());
     }
   }
+
   get value() {
-    return this.get();
+    return this._value;
   }
+
   set value(newValue) {
     this.set(newValue);
   }
