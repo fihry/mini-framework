@@ -1,32 +1,27 @@
 class Signal {
   static currentEffect = null;
   constructor(initialValue) {
-    this._value = initialValue;
+    this.value = initialValue;
     this.subscribers = new Set();
     this.isSignal = true;
   }
-
   get() {
     if (Signal.currentEffect) {
       this.subscribers.add(Signal.currentEffect);
     }
-    return this._value;
+    return this.value;
   }
-
   set(newValue) {
-    if (this._value !== newValue) {
-      this._value = newValue;
+    if (this.value !== newValue) {
+      this.value = newValue;
       this.subscribers.forEach(fn => fn());
     }
   }
-
   get value() {
-    return this._value;
+    return this.get();
   }
-
   set value(newValue) {
     this.set(newValue);
   }
 }
-
 export default Signal;
