@@ -54,14 +54,13 @@ class StateManager {
     this.refs.delete(key);
   }
 }
-export { StateManager };
 const state = new StateManager();
 
-export default state;
-
-// Named exports to be imported individually
+// Proper named exports
 export const setRef = state.setRef.bind(state);
 export const getRef = state.getRef.bind(state);
 export const removeRef = state.removeRef.bind(state);
 export const createRef = state.createRef.bind(state);
 
+// Default export for full state
+export default state;
