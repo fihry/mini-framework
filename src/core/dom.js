@@ -40,7 +40,7 @@ class VirtualDOM {
     this.tree = newTree;
   }
 
-  createDOMElement(node, dom = false) {
+  createDOMElement(node) {
     // Reactive text node from signal
     if (typeof node === "function" && node.isSignal) {
       const textNode = document.createTextNode(node());
@@ -61,7 +61,7 @@ class VirtualDOM {
         element.addEventListener(eventName, value);
       } else if (attr === "style" && typeof value === "object") {
         Object.assign(element.style, value);
-      } else if (attr === "ref" && dom) {
+      } else if (attr === "ref") {
         if (typeof value === "object" && value !== null && "current" in value) {
           value.current = element;
         } else {
